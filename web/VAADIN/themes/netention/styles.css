@@ -1,0 +1,18 @@
+@import "../reindeer/styles.css";
+
+.v-app {
+    background: #000066;
+}
+
+.AppWindowHeader {
+    color: white;
+}
+.WhiteLink {
+    color: white;
+}
+.headerRealName {
+    font-size: 24px;
+}
+.MessageContentPreview {
+    margin-bottom: 5px;
+}
