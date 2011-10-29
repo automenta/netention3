@@ -3,9 +3,10 @@
  * and open the template in the editor.
  */
 
-package automenta.netention.value.set;
+package netention.value.set;
 
-import automenta.netention.PropertyValue;
+import netention.PropertyValue;
+
 
 /**
  *

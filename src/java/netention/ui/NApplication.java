@@ -239,8 +239,8 @@ public class NApplication extends Application implements Community {
     }
 
     @Override
-    public void save(NType t) {
-        getCommunity().save(t);
+    public NType save(NType t) {
+        return getCommunity().save(t);
     }
 
     @Override

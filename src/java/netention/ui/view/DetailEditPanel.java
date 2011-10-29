@@ -4,12 +4,8 @@
  */
 package netention.ui.view;
 
-import automenta.netention.Detail;
-import automenta.netention.Pattern;
-import automenta.netention.Property;
-import automenta.netention.PropertyValue;
-import automenta.netention.Schema;
-import com.vaadin.ui.Alignment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -19,13 +15,16 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.RichTextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.collections15.CollectionUtils;
-import org.apache.commons.collections15.Predicate;
+import netention.Detail;
+import netention.NType;
+import netention.Property;
+import netention.PropertyValue;
+import netention.ui.NApplication;
 
 /**
  *
@@ -35,28 +34,92 @@ abstract public class DetailEditPanel extends VerticalLayout {
 
     public final Detail detail;
     private MenuItem patternMenu;
-    private final Schema schema;
     private final MenuBar patternBar;
     private final VerticalLayout propertiesPanel;
     private final RichTextArea text;
+    private final NApplication app;
+    private final TextField nameField;
 
-    public DetailEditPanel(Schema schema, Detail d) {
+    public DetailEditPanel(NApplication app, Detail d) {
         super();
         this.detail = d;
-        this.schema = schema;
+        this.app = app;
 
+        addStyleName("DetailEditPanel");
+        
+        HorizontalLayout topArea = new HorizontalLayout();
+        topArea.setSpacing(false);
+        topArea.setWidth("100%");
+        {
+            nameField = new TextField();
+            nameField.setValue(d.getTitle());
+            nameField.setWidth("100%");
+            topArea.addComponent(nameField);
+            topArea.setExpandRatio(nameField, 1.0f);
+
+            Button expandButton = new Button("...");
+            expandButton.addListener(new ClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                    text.setVisible(!text.isVisible());
+                }                
+            });
+            topArea.addComponent(expandButton);
+
+            Button copyButton = new Button("Copy");
+            copyButton.addListener(new ClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                    //
+                }
+            });
+            topArea.addComponent(copyButton);
+            
+
+            Button deleteButton = new Button("Delete");
+            deleteButton.addListener(new ClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                    //
+                }
+            });
+            topArea.addComponent(deleteButton);
+            
+            Button cancelButton = new Button("Cancel");
+            cancelButton.addListener(new ClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                    cancel();
+                }
+            });
+            topArea.addComponent(cancelButton);
+
+            Button saveButton = new Button("Save");
+            saveButton.addListener(new ClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                    controlsToObject();
+                    save();
+                }
+            });
+            topArea.addComponent(saveButton);
+            
+        }
+        addComponent(topArea);
+        
         text = new RichTextArea();
+        text.setValue(d.getContent());
         text.setWidth("100%");
+        text.setVisible(false);
         addComponent(text);
-
 
         HorizontalLayout typePanel = new HorizontalLayout();
 
         patternBar = new MenuBar();
+        patternBar.addStyleName("PatternBar");
         patternBar.setWidth("100%");
         typePanel.addComponent(patternBar);
 
-        refreshPatternBar();
 
         addComponent(typePanel);
 
@@ -64,35 +127,20 @@ abstract public class DetailEditPanel extends VerticalLayout {
         propertiesPanel.setWidth("100%");
         addComponent(propertiesPanel);
 
-        HorizontalLayout bottomPanel = new HorizontalLayout();
-
-        Button cancelButton = new Button("Cancel");
-        cancelButton.addListener(new ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                cancel();
-            }
-        });
-        bottomPanel.addComponent(cancelButton);
-
-        Button saveButton = new Button("Save");
-        saveButton.addListener(new ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                controlsToObject();
-                save();
-            }
-        });
-        bottomPanel.addComponent(saveButton);
-        addComponent(bottomPanel);
-        setComponentAlignment(bottomPanel, Alignment.TOP_CENTER);
+//        HorizontalLayout bottomPanel = new HorizontalLayout();
+//
+//        addComponent(bottomPanel);
+//        setComponentAlignment(bottomPanel, Alignment.TOP_CENTER);
 
         //setComponentAlignment(bottomPanel, Alignment.TOP_RIGHT);
+        
+        refreshPatternBar();
+        refreshProperties();
     }
 
     protected void controlsToObject() {
-        detail.setName(text.toString());
-        detail.setWhenModified(new Date());
+        detail.setTitle(text.toString());
+        detail.setEdited(new Date());
 
         //TODO remove and add patterns
         
@@ -108,27 +156,24 @@ abstract public class DetailEditPanel extends VerticalLayout {
         patternBar.removeItems();
         patternMenu = patternBar.addItem(">>>", null, null);
         
-        final Collection<String> allPatterns = schema.getPatterns().keySet();
-        final List<String> presentPatterns = detail.getPatterns();
+        final Collection<NType> allPatterns = app.getTypes(null);
+        final List<String> presentPatterns = detail.getTypes();
 
-        Collection<String> missingPatterns = new LinkedList(allPatterns);
-        CollectionUtils.filter(missingPatterns, new Predicate<String>() {
-
+        Collection<NType> missingPatterns = Collections2.filter(allPatterns, new Predicate<NType>() {
             @Override
-            public boolean evaluate(String t) {
-                return !presentPatterns.contains(t);
+            public boolean apply(NType t) {
+                return !presentPatterns.contains(t.getID());
             }
         });
 
         //1. add all non-present patterns to 'patternMenu'
-        for (final String p : missingPatterns) {
-            Pattern pattern = schema.getPatterns().get(p);
+        for (final NType pattern : missingPatterns) {
             String pName = pattern.getName();
             patternMenu.addItem(pName, new Command() {
 
                 @Override
                 public void menuSelected(MenuItem selectedItem) {
-                    addNewPattern(p);
+                    addNewPattern(pattern.getID());
                 }
             });
         }
@@ -143,17 +188,16 @@ abstract public class DetailEditPanel extends VerticalLayout {
 
         //2. add all present patterns to 'patternBar' as menus
         for (final String p : presentPatterns) {
-            Pattern pattern = schema.getPatterns().get(p);
+            NType pattern = app.getType(p);
             int total = getPropertiesTotal(pattern);
             MenuItem i = patternBar.addItem(pattern.getName() + " (" + (total - getPropertiesNotPresent(pattern)) + "/" + total + ")", null, null);
 
-            for (String property : pattern.keySet()) {
+            for (final Property property : app.getProperties(pattern, true, false)) {
                 if (supportsAnotherProperty(property)) {
-                    final Property pr = schema.getProperty(property);
-                    i.addItem(pr.getName(), new Command() {
+                    i.addItem(property.getName(), new Command() {
                         @Override
                         public void menuSelected(MenuItem selectedItem) {
-                            addProperty(pr.getID());
+                            addProperty(property.getID());
                         }
                     });
                 }
@@ -174,11 +218,11 @@ abstract public class DetailEditPanel extends VerticalLayout {
     }
 
     public void addProperty(String id) {
-        Property p = schema.getProperty(id);
+        Property p = app.getPropertyByID(id);
         PropertyValue propertyValue = p.newDefaultValue(detail.getMode());
         propertyValue.setProperty(id);
 
-        detail.getProperties().add(propertyValue);
+        detail.addValue(propertyValue);
 
         refreshPatternBar();
         refreshProperties();
@@ -197,8 +241,8 @@ abstract public class DetailEditPanel extends VerticalLayout {
     protected void refreshProperties() {
         propertiesPanel.removeAllComponents();
 
-        for (final PropertyValue pv : detail.getProperties()) {
-            Property p = schema.getProperty(pv.getProperty());
+        for (final PropertyValue pv : detail.getValues()) {
+            Property p = app.getPropertyByID(pv.getProperty());
             if (p!=null) {
                 propertiesPanel.addComponent(new ValueEditPanel(p, pv) {
                     @Override
@@ -216,23 +260,23 @@ abstract public class DetailEditPanel extends VerticalLayout {
     }
 
     public void removeProperty(PropertyValue pv) {
-        detail.getProperties().remove(pv);
+        detail.removeValue(pv);
         refreshPatternBar();
         refreshProperties();
     }
 
     public boolean definedProperty(String p) {
-        for (PropertyValue pv : detail.getProperties()) {
+        for (PropertyValue pv : detail.getValues()) {
             if (pv.getProperty().equals(p))
                 return true;
         }
         return false;
     }
 
-    public int getPropertiesNotPresent(Pattern p) {
+    public int getPropertiesNotPresent(NType p) {
         int count = 0;
-        for (String pid : p.keySet()) {
-            if (!definedProperty(pid)) {
+        for (Property pid : app.getAvailableProperties(detail, p.getID()).keySet()) {
+            if (!definedProperty(pid.getID())) {
                 count++;
             }
         }
@@ -240,30 +284,28 @@ abstract public class DetailEditPanel extends VerticalLayout {
     }
     public int getPropertiesPresent(String propertyID) {
         int count = 0;
-        for (PropertyValue pv : detail.getProperties()) {
+        for (PropertyValue pv : detail.getValues()) {
             if (pv.getProperty().equals(propertyID))
                 count++;
         }
         return count;
     }
 
-    public int getPropertiesTotal(Pattern p) {
-        return p.size();
+    public int getPropertiesTotal(NType p) {
+        return app.getProperties(p, true, false).size();
     }
 
     abstract public void createNewPattern();
 
     public void addNewPattern(String patternID) {
-        if (!detail.getPatterns().contains(patternID)) {
-            Pattern p = schema.getPatterns().get(patternID);
+        if (!detail.getTypes().contains(patternID)) {
+            NType p = app.getType(patternID);
             if (p!=null) {
-                detail.getPatterns().add(patternID);
+                detail.getTypes().add(patternID);
 
-                for (String propertyID : p.keySet()) {
-                    //String spr = p.get(propertyID);
-                    Property pr = schema.getProperty(propertyID);
+                for (Property pr : app.getProperties(p, false, false)) {
                     if (pr.getCardinalityMin() > 0) {
-                        for (int i = getPropertiesPresent(propertyID); i < pr.getCardinalityMin(); i++) {
+                        for (int i = getPropertiesPresent(pr.getID()); i < pr.getCardinalityMin(); i++) {
                             addProperty(pr.getID());
                         }
                     }
@@ -276,22 +318,22 @@ abstract public class DetailEditPanel extends VerticalLayout {
     }
 
     public void removePattern(String patternID) {
-        if (detail.getPatterns().contains(patternID)) {
-            detail.getPatterns().remove(patternID);
+        if (detail.getTypes().contains(patternID)) {
+            detail.getTypes().remove(patternID);
             refreshPatternBar();
         }
     }
 
-    public boolean supportsAnotherProperty(String propertyID) {
-        Property p = schema.getProperty(propertyID);
+    public boolean supportsAnotherProperty(Property p) {
         if (p.getCardinalityMax() == -1)
             return true;
 
-        int present = getPropertiesPresent(propertyID);
+        int present = getPropertiesPresent(p.getID());
         if (present < p.getCardinalityMax())
             return true;
 
         return false;
     }
 
+    
 }

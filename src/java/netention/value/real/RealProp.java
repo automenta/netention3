@@ -11,7 +11,7 @@ import netention.PropertyValue;
 
 public class RealProp extends Property {
 
-	//private Unit unit;
+	private String unit;
 	
 	public RealProp() {
 		super();
@@ -21,10 +21,10 @@ public class RealProp extends Property {
 		super(id, name);
 	}
 	
-//	public RealProp(String id, String name, Unit unit) {
-//		super(id, name);
-//		this.unit = unit;	
-//	} 
+	public RealProp(String id, String name, String unit) {
+		super(id, name);
+		this.unit = unit;	
+	} 
 	
 //	public Unit getUnit() {
 //		return unit;

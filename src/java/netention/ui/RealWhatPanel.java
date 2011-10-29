@@ -6,7 +6,7 @@ package netention.ui;
 
 import com.vaadin.ui.VerticalLayout;
 import netention.Detail;
-import netention.ui.view.DetailEditPanel2;
+import netention.ui.view.DetailEditPanel;
 
 /**
  *
@@ -31,7 +31,7 @@ public class RealWhatPanel extends AbstractWhatPanel {
         VerticalLayout vs = new VerticalLayout();
         
         // Put other components in the right panel
-        vs.addComponent(new DetailEditPanel2(app, d) {
+        vs.addComponent(new DetailEditPanel(app, d) {
 
             @Override
             public void cancel() {

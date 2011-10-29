@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package automenta.netention.value.set;
+package netention.value.set;
 
-import automenta.netention.Mode;
-import automenta.netention.Property;
-import automenta.netention.PropertyValue;
 import java.util.Arrays;
 import java.util.List;
+import netention.Mode;
+import netention.Property;
+import netention.PropertyValue;
 
 /**
  *

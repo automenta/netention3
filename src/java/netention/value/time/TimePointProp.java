@@ -1,7 +1,7 @@
-package automenta.netention.value.time;
+package netention.value.time;
 
-import automenta.netention.value.real.RealProp;
-import automenta.netention.Unit;
+import netention.value.real.RealProp;
+
 
 
 public class TimePointProp extends RealProp {
@@ -11,7 +11,7 @@ public class TimePointProp extends RealProp {
 	}
 	
 	public TimePointProp(String id, String name) {
-		super(id, name, Unit.TimePoint);
+		super(id, name, "TimePoint" /*Unit.TimePoint*/);
 	}
 
 }

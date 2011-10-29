@@ -4,14 +4,18 @@
  */
 package netention.ui;
 
+import com.google.common.base.Predicate;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import netention.NType;
 
 /**
@@ -71,22 +75,44 @@ public class SchemaPanel extends VerticalLayout {
     }
 
     public Table newTable(Collection<NType> types) {        
-        final Table table = new Table();
+        final TreeTable table = new TreeTable();
         
         table.addContainerProperty("Name", String.class,  null);
         table.addContainerProperty("# Inherited Properties",  Integer.class,  null);
         table.addContainerProperty("# Local Properties",  Integer.class,  null);
         table.addContainerProperty("Supertypes",       String.class, null);
 
+        Map<NType,Object> mp = new HashMap();
+        
         for (final NType t : types) {
             
 
             int numLocal = app.getProperties(t, false, false).size();
             int numTotal = app.getProperties(t, true, false).size();
             
-            table.addItem(new Object[] {
-                t.getName(), numTotal - numLocal, numLocal, t.superTypes.toString()}, t);
+            mp.put(t, table.addItem(new Object[] {
+                t.getName(), numTotal - numLocal, numLocal, t.superTypes.toString()}, t));
+            
         }
+        for (final NType t : types) {
+            if (t.getSubtypes(t, app).isEmpty())
+                table.setChildrenAllowed(mp.get(t), false);
+            for (String s : t.superTypes) {
+                table.setParent(mp.get(t), mp.get(app.getType(s)));      
+                break;
+            }
+        }
+
+//        //All roots
+//        for (final NType t : app.getTypes(new Predicate<NType>() {
+//            @Override
+//            public boolean apply(NType t) {
+//                return t.superTypes.isEmpty();
+//            }            
+//        })) {
+//            drillDown(table, mp, t);
+//
+//        }
         
         //table.setPageLength(table.size());
 
@@ -103,6 +129,20 @@ public class SchemaPanel extends VerticalLayout {
         });
         
         return table;
+    }
+
+    private void drillDown(TreeTable table, Map<NType, Object> mp, NType t) {
+            int numLocal = app.getProperties(t, false, false).size();
+            int numTotal = app.getProperties(t, true, false).size();
+
+            mp.put(t, table.addItem(new Object[] {
+                t.getName(), numTotal - numLocal, numLocal, t.superTypes.toString()}, null));
+            
+            for (NType s : t.getSubtypes(t, app)) {
+
+                drillDown(table, mp, s);
+                //table.setParent(mp.get(s), mp.get(t));
+            }
     }
         
     

@@ -3,14 +3,12 @@
  * and open the template in the editor.
  */
 
-package automenta.netention.value.set;
+package netention.value.set;
 
-import automenta.netention.DefiniteValue;
-import automenta.netention.IndefiniteValue;
-import automenta.netention.PropertyValue;
-import automenta.netention.value.string.StringContains;
-import automenta.netention.value.string.StringEquals;
-import automenta.netention.value.string.StringNotContains;
+import netention.DefiniteValue;
+import netention.IndefiniteValue;
+import netention.PropertyValue;
+
 
 /**
  *

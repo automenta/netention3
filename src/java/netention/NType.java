@@ -4,18 +4,30 @@
  */
 package netention;
 
+import com.google.common.base.Predicate;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author seh
  */
 public class NType implements Serializable {
+
+    public Collection<NType> getSubtypes(final NType n, final Community c) {
+        return c.getTypes(new Predicate<NType>() {
+            @Override
+            public boolean apply(final NType t) {
+                return (t.superTypes.contains(n.id));
+            }            
+        });
+    }
     
     public static class NMember {        
         public boolean required;        
@@ -25,6 +37,7 @@ public class NType implements Serializable {
     public String id;  //URI
     private String name;     //TODO internationalize
     public String description;      //TODO internationalize
+    private String iconURL;
     
     public List<String> superTypes = new LinkedList();    
     
@@ -37,8 +50,8 @@ public class NType implements Serializable {
     public NType(final String id) {
         super();
         
-        this.id = id;
-        this.name = id;
+        setID(id);
+        setName(id);
 //        this.node = n;
 //        try {
 //            if (node!=null)
@@ -47,6 +60,19 @@ public class NType implements Serializable {
 //            ex.printStackTrace();
 //        }
         
+    }
+
+    public NType setIconURL(String iconURL) {
+        this.iconURL = iconURL;
+        return this;
+    }
+    
+    public NType add(Community c, Property... p) {
+        for (Property pp : p) {
+            pp.setDomains(this.getID());            
+            c.save(pp);
+        }
+        return this;
     }
     
 //    public void save() {
@@ -57,8 +83,9 @@ public class NType implements Serializable {
 //        }
 //    }
 
-    public void setName(String name) {
+    public NType setName(String name) {
         this.name = Property.stripQuotes(name);
+        return this;
     }
 
     public String getName() {
@@ -68,6 +95,13 @@ public class NType implements Serializable {
     public String getDescription() {
         return description;
     }
+
+    public NType setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+    
+    
 
     public String getID() {
         return id;
@@ -86,10 +120,12 @@ public class NType implements Serializable {
     public String toString2(Community c) {
         String s = "";
         s += name + " (" + id + ")\n\n";
-        s += "Extends:\n";
+        s += "Subtype of:\n";
         for (String x : superTypes) {
             s +="    " + x + "\n";
         }
+        s += "Supertype of:\n" + getSubtypes(this, c) + "\n";
+                
         //s += c.getSuperTypes(this).toString() + "\n";                
         
         s += "\n";

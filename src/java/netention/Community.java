@@ -30,10 +30,9 @@ public interface Community {
         public void save(Detail d);
         
         //NTYPE
-        public NType newType(String id);
         public NType getType(String id);
         public Collection<NType> getTypes(Predicate<NType> pred);
-        public void save(NType t);
+        public NType save(NType t);
         public void remove(NType t);
         public Set<String> getSuperTypes(NType type);
         

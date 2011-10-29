@@ -85,12 +85,6 @@ public class MemCommunity implements Community, Serializable {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public NType newType(String id) {
-        NType t = new NType(id);
-        types.put(id, t);
-        return t;
-    }
 
     @Override
     public NType getType(String id) {
@@ -99,8 +93,9 @@ public class MemCommunity implements Community, Serializable {
 
 
     @Override
-    public void save(NType t) {
+    public NType save(NType t) {
         types.put(t.getName(), t);
+        return t;
     }
 
     @Override

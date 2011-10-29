@@ -4,6 +4,7 @@
  */
 package netention;
 
+import com.google.common.collect.Sets;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -67,7 +68,9 @@ abstract public class Property implements Serializable {
         
 	public String getName() {
 		if (name == null)
-			return getID();
+                    return getID();
+                if (name.length()==0)
+                    return getID();
 		return name;
 	}
 		
@@ -97,5 +100,9 @@ abstract public class Property implements Serializable {
 	public Property setDescription(String description) {
 		this.desc = description;
         return this;
-	}    
+	}
+
+    void setDomains(String... typeID) {
+        setDomains(Sets.newHashSet(typeID));        
+    }
 }

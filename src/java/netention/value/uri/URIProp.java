@@ -3,9 +3,10 @@
  * and open the template in the editor.
  */
 
-package automenta.netention.value.uri;
+package netention.value.uri;
 
-import automenta.netention.value.string.StringProp;
+import netention.value.string.StringProp;
+
 
 /**
  *
