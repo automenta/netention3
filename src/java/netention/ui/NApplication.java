@@ -224,11 +224,6 @@ public class NApplication extends Application implements Community {
     }
 
     @Override
-    public NType newType(String id) {
-        return getCommunity().newType(id);
-    }
-
-    @Override
     public NType getType(String id) {
         return getCommunity().getType(id);
     }

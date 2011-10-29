@@ -30,23 +30,26 @@ public class RealWhatPanel extends AbstractWhatPanel {
         
         VerticalLayout vs = new VerticalLayout();
         
-        // Put other components in the right panel
-        vs.addComponent(new DetailEditPanel(app, d) {
+        if (d != null) {
 
-            @Override
-            public void cancel() {
-            }
+            // Put other components in the right panel
+            vs.addComponent(new DetailEditPanel(app, d) {
 
-            @Override
-            public void save() {
-            }
+                @Override
+                public void cancel() {
+                }
 
-            @Override
-            public void createNewPattern() {
-            }
-            
-        });
-        //vsplit.addComponent(new Label("Here's the lower panel"));
+                @Override
+                public void save() {
+                }
+
+                @Override
+                public void createNewPattern() {
+                }
+
+            });
+            //vsplit.addComponent(new Label("Here's the lower panel"));
+        }
         
         hsplit.setSecondComponent(vs);
     }

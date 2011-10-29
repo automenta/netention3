@@ -94,7 +94,7 @@ public class MemCommunity implements Community, Serializable {
 
     @Override
     public NType save(NType t) {
-        types.put(t.getName(), t);
+        types.put(t.getId(), t);
         return t;
     }
 
@@ -140,6 +140,9 @@ public class MemCommunity implements Community, Serializable {
         return Collections2.filter(getProperties(null), new Predicate<Property>() {
             @Override
             public boolean apply(final Property t) {
+                if (type == null)
+                    return false;
+                
                 if (t.getDomains().isEmpty())
                     return includeOrphaned;
                 
@@ -163,6 +166,12 @@ public class MemCommunity implements Community, Serializable {
     }
     
     protected void getSuperclasses(Set<String> target, NType t) {
+        if (t == null)
+            return;
+        
+        if (t.superTypes == null)
+            return;
+        
         for (String x : t.superTypes) {
             if (!target.contains(x)) {
                 target.add(x);

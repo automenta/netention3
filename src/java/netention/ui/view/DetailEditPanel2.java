@@ -155,9 +155,9 @@ abstract public class DetailEditPanel2 extends VerticalLayout {
                 public void setPushed(boolean b) {
                     super.setPushed(b);
                     if (isPushed()) {
-                        addNewPattern(pattern.getID());
+                        addNewPattern(pattern.getId());
                     } else {
-                        removePattern(pattern.getID());
+                        removePattern(pattern.getId());
                     }
                 }
             };

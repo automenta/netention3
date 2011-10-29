@@ -33,8 +33,8 @@ public class ExampleCommunity extends MemCommunity implements Community, Seriali
         super();
         
         try {
-            //addAll(loadJSON("/tmp/netention.json"));
-            //System.out.println("Loaded " + getTypes().size() + " types, and " + getProperties().size() + " properties");
+            addAll(loadJSON("/tmp/netention.json"));
+            System.out.println("Loaded " + getTypes().size() + " types, and " + getProperties().size() + " properties");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -50,7 +50,7 @@ public class ExampleCommunity extends MemCommunity implements Community, Seriali
             Detail d = new Detail();
             d.setTitle("TypeTester Instance");
             d.setMode(Mode.Real);
-            d.addType(tt.getID());
+            d.addType(tt.getId());
             d.addValue(new IntegerIs(1).forProperty("integer_test"));
             d.addValue(new NodeIs(d).forProperty("node_test"));
             save(d);

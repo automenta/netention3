@@ -162,7 +162,7 @@ abstract public class DetailEditPanel extends VerticalLayout {
         Collection<NType> missingPatterns = Collections2.filter(allPatterns, new Predicate<NType>() {
             @Override
             public boolean apply(NType t) {
-                return !presentPatterns.contains(t.getID());
+                return !presentPatterns.contains(t.getId());
             }
         });
 
@@ -173,7 +173,7 @@ abstract public class DetailEditPanel extends VerticalLayout {
 
                 @Override
                 public void menuSelected(MenuItem selectedItem) {
-                    addNewPattern(pattern.getID());
+                    addNewPattern(pattern.getId());
                 }
             });
         }
@@ -203,6 +203,9 @@ abstract public class DetailEditPanel extends VerticalLayout {
                 }
             }
 
+            //i.addSeparator();
+            //TODO add "Specialize to " [ subclasses]
+            
             i.addSeparator();
 
             //move left (more important)
@@ -275,7 +278,7 @@ abstract public class DetailEditPanel extends VerticalLayout {
 
     public int getPropertiesNotPresent(NType p) {
         int count = 0;
-        for (Property pid : app.getAvailableProperties(detail, p.getID()).keySet()) {
+        for (Property pid : app.getAvailableProperties(detail, p.getId()).keySet()) {
             if (!definedProperty(pid.getID())) {
                 count++;
             }
@@ -301,7 +304,7 @@ abstract public class DetailEditPanel extends VerticalLayout {
         if (!detail.getTypes().contains(patternID)) {
             NType p = app.getType(patternID);
             if (p!=null) {
-                detail.getTypes().add(patternID);
+                detail.addType(patternID);
 
                 for (Property pr : app.getProperties(p, false, false)) {
                     if (pr.getCardinalityMin() > 0) {

@@ -35,9 +35,9 @@ public class NType implements Serializable {
     }
 
     public String id;  //URI
-    private String name;     //TODO internationalize
+    public String name;     //TODO internationalize
     public String description;      //TODO internationalize
-    private String iconURL;
+    public String iconURL;
     
     public List<String> superTypes = new LinkedList();    
     
@@ -48,10 +48,14 @@ public class NType implements Serializable {
     }
     
     public NType(final String id) {
+        this(id, id);               
+    }
+    
+    public NType(final String id, final String name) {
         super();
         
-        setID(id);
-        setName(id);
+        setId(id);
+        setName(name);
 //        this.node = n;
 //        try {
 //            if (node!=null)
@@ -69,7 +73,7 @@ public class NType implements Serializable {
     
     public NType add(Community c, Property... p) {
         for (Property pp : p) {
-            pp.setDomains(this.getID());            
+            pp.setDomains(this.getId());            
             c.save(pp);
         }
         return this;
@@ -103,11 +107,11 @@ public class NType implements Serializable {
     
     
 
-    public String getID() {
+    public String getId() {
         return id;
     }
 
-    public void setID(String id) {
+    public void setId(String id) {
         this.id = id;
     }      
     
