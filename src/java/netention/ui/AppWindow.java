@@ -9,6 +9,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import netention.Community;
+import netention.Detail;
 import netention.Self;
 import org.vaadin.appfoundation.authentication.SessionHandler;
 
@@ -36,7 +37,7 @@ public class AppWindow extends Window {
         
     }
     
-    protected void refresh() {
+    public void refresh() {
         this.agent = (Self)SessionHandler.get();
         
         getContent().removeAllComponents();
@@ -75,13 +76,13 @@ public class AppWindow extends Window {
         l5.addComponent(new Label("There is no new feedback."));
 
         t = new TabSheet();
-        t.addTab(new SchemaPanel(app), "Ontology");
-        t.addTab(new NowPanel(app), "Now");
         t.addTab(new RealWhatPanel(app), "What Is");
         t.addTab(l5, "What Will Be");
+        t.addTab(new NowPanel(app), "Now");
         t.addTab(l2, "Who");
         t.addTab(l3, "Where");
         t.addTab(l4, "When");
+        t.addTab(new SchemaPanel(app), "Ontology");
         
         //t.addListener(this);
         t.setSizeFull();
@@ -102,5 +103,9 @@ public class AppWindow extends Window {
         
         getContent().addComponent(xv);
 
+    }
+    
+    public void focus(Detail d) {
+        refresh();
     }
 }

@@ -16,6 +16,10 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.Window.CloseEvent;
+import com.vaadin.ui.Window.CloseListener;
+import netention.Detail;
 import org.vaadin.appfoundation.authentication.data.User;
 
 /**
@@ -37,9 +41,38 @@ public class Header extends HorizontalLayout {
         
         String userString = (user == null) ? "Anonymous" : user.getName();
 
-        final Label nameLabel = new Label(userString);
+        Button newButton = new Button("+");
+        newButton.addListener(new ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                final Window w = new Window("New Detail");                
+                final NewWindow nw = new NewWindow(app) {
+
+                    @Override
+                    protected void close() {
+                        Header.this.getWindow().removeWindow(w);
+                        Detail d = getDetail();
+                        if (d!=null) {
+                            Header.this.getWindow().showNotification("Detail created: " + d.getTitle());
+                            browser.focus(d);
+                        }                        
+                    }
+                };
+                w.setWidth("80%");
+                w.setHeight("80%");
+                w.addComponent(nw);
+                w.setModal(true);
+                w.center();
+                getWindow().addWindow(w);
+            }            
+        });
+        newButton.addStyleName("headerRealName");
+        addComponent(newButton);
+        
+        final Label nameLabel = new Label(userString);        
         nameLabel.addStyleName("headerRealName");
         addComponent(nameLabel);
+        
         setExpandRatio(nameLabel, 0.9f);
         setComponentAlignment(nameLabel, Alignment.TOP_LEFT);
         

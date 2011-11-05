@@ -119,8 +119,6 @@ public class SchemaPanel extends VerticalLayout {
         table.setSelectable(true);
         //table.setMultiSelect(false);
         table.setImmediate(true); // react at once when something is selected      
-
-        table.setColumnReorderingAllowed(true);
         
         table.addListener(new Table.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
